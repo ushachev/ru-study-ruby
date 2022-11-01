@@ -6,15 +6,12 @@ module Exercise
 
       # Написать свою функцию my_each
       def my_each(&block)
-        iter = lambda { |collection|
-          return self if collection.empty?
+        return self if empty?
 
-          head, *tail = collection
-          block.call(head)
-          iter.call(tail)
-        }
+        head, *tail = self
+        block.call(head)
 
-        iter.call(self)
+        MyArray.new([head]).concat MyArray.new(tail).my_each(&block)
       end
 
       # Написать свою функцию my_map
@@ -29,19 +26,12 @@ module Exercise
 
       # Написать свою функцию my_reduce
       def my_reduce(initial_operand = nil, &block)
-        iter = lambda { |collection, acc|
-          return acc if collection.empty?
+        return initial_operand if empty?
 
-          head, *tail = collection
-          iter.call(tail, block.call(acc, head))
-        }
+        head, *tail = self
+        acc = initial_operand.nil? ? head : block.call(initial_operand, head)
 
-        if initial_operand.nil?
-          first, *rest = self
-          iter.call(rest, first)
-        else
-          iter.call(self, initial_operand)
-        end
+        MyArray.new(tail).my_reduce(acc, &block)
       end
     end
   end
